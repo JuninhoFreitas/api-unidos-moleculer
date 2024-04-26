@@ -1,0 +1,33 @@
+{
+	"root": true,
+	"env": {
+		"node": true,
+		"jest": true,
+		"jasmine": true,
+        "es6": true
+	},
+	"extends": "eslint:recommended",
+	"parser": "@babel/eslint-parser",
+    "plugins": ["importAttributes"],
+	"parserOptions": {
+        
+        "ecmaVersion": "latest",
+		"requireConfigFile": false,
+		"babelOptions": {
+			"babelrc": false,
+			"configFile": false,
+			// your babel options
+			"presets": ["@babel/preset-env"]
+		}
+	},
+	"rules": {
+		"indent": ["warn", "tab", { "SwitchCase": 1 }],
+		"quotes": ["warn", "single"],
+		"semi": ["error", "always"],
+		"no-var": ["error"],
+		"no-console": ["off"],
+		"no-unused-vars": ["warn"],
+		"no-mixed-spaces-and-tabs": ["warn"],
+		"max-len": ["warn", { "code": 120 }]
+	}
+}

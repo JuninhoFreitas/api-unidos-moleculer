@@ -1,0 +1,83 @@
+# config
+
+# x-service: &service
+#   image: node:20-alpine
+#   user: root
+#   working_dir: /home/app
+#   entrypoint: yarn
+#   command: dev
+#   depends_on:
+#     - redis
+#     - rabbitmq
+#     - postgres
+#   expose:
+#     - 8000
+#   environment:
+#     - PORT=8000
+#     - APP_ENV=local
+#     - NODE_ENV=local
+#     - TZ=America/Sao_Paulo
+#     - REDIS_CONNECTION_STRING=redis://redis:6379
+#     - RABBITMQ_CONNECTION_STRING=amqp://user:pass@rabbitmq:5672
+#     - POSTGRES_CONNECTION_STRING=postgresql://user:pass@postgres:5432/db
+
+
+services:
+
+  # solution
+
+  # svc:
+  #   <<: *service
+  #   volumes:
+  #     - ./:/home/app
+  #   ports:
+  #     - "8000:8000"
+
+  # migrations:
+  #   <<: *service
+  #   restart: 'no'
+  #   volumes:
+  #     - ./:/home/app
+  #   entrypoint: yarn
+  #   command: run migrate:up
+
+
+  # dependencies
+
+  redis:
+    image: bitnami/redis
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+    environment:
+      - TZ=America/Sao_Paulo
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - rabbitmq_data:/rabbitmq/mnesia
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    environment:
+        - RABBITMQ_DEFAULT_USER=my_user
+        - RABBITMQ_DEFAULT_PASS=my_password
+
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - postgres_data:/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+
+
+volumes:
+  rabbitmq_data: {}
+  postgres_data: {}

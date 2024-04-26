@@ -1,0 +1,10 @@
+{
+  "watch": [
+    "src",
+    "src/services",
+    "config",
+    "src/concerns/assets"
+  ],
+  "ext": "js,json",
+  "exec": "yarn moleculer-runner-esm --hot --env --config moleculer.config.js ./src/**/*.service.js"
+}
