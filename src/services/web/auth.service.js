@@ -23,8 +23,8 @@ const users = [
 /**
  * Authentication & Authorization service
  */
-export const name = 'auth';
-export const actions = {
+const name = 'auth';
+const actions = {
 	login: {
 		params: {
 			username: 'email',
@@ -73,6 +73,8 @@ export const actions = {
 				roles: ['user'],
 			};
 
+			this.logger.info(user)
+
 			const createdUser = await ctx.call('users-db.create', user);
 			if (!createdUser) {
 				return Promise.reject(
@@ -88,41 +90,38 @@ export const actions = {
 	verifyToken(ctx) {
 		return this.verify(ctx.params.token, JWT_SECRET);
 	},
-	getUserByID(ctx) {
-		return users.find((u) => u.id == ctx.params.id);
-	},
 
 	resolveToken: {
 		cache: {
 			keys: ['token'],
 			ttl: 60 * 60, // 1 hour
 		},
-		params: {
-			token: 'string',
-		},
-		handler(ctx) {
-			return new this.Promise((resolve, reject) => {
-				verify(ctx.params.token, JWT_SECRET, (err, decoded) => {
-					if (err) {
-						return reject(err);
-					}
-					resolve(decoded);
-				});
-			}).then((decoded) => {
-				if (decoded.id) {
-					return users.find((u) => u.id == decoded.id);
+		headers: true,
+		async handler(ctx, route, req, res) {
+			const auth = ctx.meta.authToken.split(' ')[1];
+				const verified = await this.verify(auth, JWT_SECRET)
+				console.log(verified)
+				if (verified.id) {
+					// Get user from DB
+					ctx.call('users-db.get', { id: verified.id }).then((user) => {
+						if (user) {
+							return user;
+						}
+						return this.Promise.reject(
+							new MoleculerError('User not found', 401)
+						);
+					});
 				}
-			});
 		},
 	},
 };
-export function created() {
+function created() {
 	// Create Promisify encode & verify methods
 	this.encode = promisify(jwt.sign);
 	this.decode = promisify(jwt.decode);
 	this.verify = promisify(jwt.verify);
 }
-export const methods = {
+const methods = {
 	/**
 	 * Generate JWT token
 	 *

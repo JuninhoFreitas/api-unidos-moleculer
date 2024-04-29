@@ -29,6 +29,7 @@ export default {
 				password: {
 					type: Sequelize.STRING,
 					allowNull: false,
+					unique: false,
 				},
 				roles: {
 					type: Sequelize.ARRAY(Sequelize.STRING),
